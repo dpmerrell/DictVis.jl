@@ -1,23 +1,51 @@
 
 
-export generate_plot
+export generate_plot, @traversable
 
+
+##############################################
+# Keep track of which types count as 
+# traversable (dictionary-like) structures.
+##############################################
+
+is_traversable(x) = false
+
+"""
+    traversable(t)
+
+    Indicate that type `t` counts as an
+    internal node for DictVis. I.e., it is
+    dictionary-like and may have plottable descendants.
+"""
+macro traversable(t)
+    return :(is_traversable(x::$t) = true) 
+end
+
+## Make some important types traversable by default
+#for t in (AbstractDict, NamedTuple, Tuple)
+#    @traversable t
+#end
+@traversable AbstractDict
+@traversable NamedTuple
+@traversable Tuple
+
+
+#####################################################
+# Traverse & operate on the leaves of the tree via DFS
+##################################################### 
 
 function rec_count_leaves(d)
 
     # Base case: this is a plottable leaf
-    if has_leaf_type(d) 
+    if is_plottable(d) 
         return 1
     end
 
-    # Check whether this node
-    # is dict-like
+    # Check whether this node is traversable
     ks = nothing
-    try
+    if is_traversable(d)
         ks = keys(d)
-    catch
-        # This node is neither a plottable leaf
-        # nor a dict-like interior node
+    else
         return 0
     end
 
@@ -45,7 +73,7 @@ function generate_traces_buttons(d, leaf_idx, total_leaves;
 
     # Base case -- this is a plottable leaf.
     # Increment leaf index; generate trace, button
-    if has_leaf_type(d) 
+    if is_plottable(d) 
         leaf_idx += 1
 
         new_trace = leaf_trace(d)
@@ -58,9 +86,9 @@ function generate_traces_buttons(d, leaf_idx, total_leaves;
 
     # Check whether this node is dict-like
     ks = nothing
-    try
+    if is_traversable(d)
         ks = keys(d)
-    catch
+    else
         # This node is neither a plottable leaf
         # nor a dict-like interior node
         return leaf_idx 
