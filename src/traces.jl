@@ -8,11 +8,12 @@
 
 @plottable AbstractVector{<:Real}
 function leaf_trace(leaf::AbstractVector{<:Real})
-    trace = scatter(y=leaf[:])
+    trace = scatter(y=float.(leaf))
     return trace
 end
 
 MAX_HEATMAP_SIZE = 10000
+
 
 @plottable AbstractMatrix{<:Real}
 function leaf_trace(leaf::AbstractMatrix{<:Real})
@@ -25,7 +26,7 @@ function leaf_trace(leaf::AbstractMatrix{<:Real})
         leaf = downsample(leaf, shrinkage)
     end
 
-    trace = heatmap(z=leaf[:,:], type="heatmap", colorscale="Greys", reversescale=true)
+    trace = heatmap(z=float.(leaf), type="heatmap", colorscale="Greys", reversescale=true)
     return trace
 end
 

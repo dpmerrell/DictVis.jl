@@ -18,6 +18,7 @@ function basic_tests()
 
         generate_html(d, html_path) 
         @test isfile(html_path)
+        rm(html_path)
     end 
     
 end
@@ -45,13 +46,49 @@ function extension_tests()
         # We'll just test that this runs to completion
         p = generate_html(f, html_path)
         @test isfile(html_path)
+        
+        rm(html_path)
     end 
     
 end
 
+mutable struct MyStruct2
+    X::Vector{<:Real}
+    y::Vector{Bool}
+    name::String
+end
+@traversable_fields MyStruct2
+
+mutable struct MyStruct
+    X::Matrix{<:Real}
+    name::String
+    children::MyStruct2
+end
+@traversable_fields MyStruct
+
+
+function traversable_fields_tests()
+
+    ms2 = MyStruct2(randn(10), rand(Bool, 20), "mystruct2")
+    ms1 = MyStruct(randn(10,10), "mystruct", ms2)
+
+    html_path = "test_traversable_fields.html"
+
+    @testset "Extension test: HDF5" begin
+
+        # We'll just test that this runs to completion
+        p = generate_html(ms1, html_path)
+        @test isfile(html_path)
+        rm(html_path)
+    end 
+    
+end
+
+
 function main()
     basic_tests()
     extension_tests()
+    traversable_fields_tests()
 end
 
 main()

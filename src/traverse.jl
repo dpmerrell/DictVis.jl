@@ -1,6 +1,6 @@
 
 
-export generate_plot, @traversable
+export generate_plot, @traversable, @traversable_fields
 
 
 ##############################################
@@ -21,14 +21,49 @@ macro traversable(t)
     return :(is_traversable(x::$(esc(t))) = true) 
 end
 
-## Make some important types traversable by default
-#for t in (AbstractDict, NamedTuple, Tuple)
-#    @traversable t
-#end
+# Make some important types traversable by default
 @traversable AbstractDict
 @traversable NamedTuple
 @traversable Tuple
 
+
+################################################
+# Provide a convenience macro for 
+# making arbitrary structs traversable
+################################################
+
+"""
+    traversable_fields(t)
+
+    Given the type `t` for an arbitrary struct,
+    define the necessary interface for making it
+    traversable like a dictionary.
+
+    A convenience macro that defines the functions 
+    `is_traversable(::t)`,
+    `keys(::t)`, and `getindex(::t)`
+    for type `t`, under the assumption that the `t`'s 
+    fieldnames serve as keys and fields serve as values.
+
+    This is of practical interest since models are
+    often represented as (possibly nested) Julia structs.
+"""
+macro traversable_fields(t)
+
+    code = quote
+        function Base.keys(d::$(esc(t)))
+            return collect(fieldnames($(esc(t))))
+        end
+        function Base.getindex(d::$(esc(t)), k)
+            return getfield(d, k)
+        end
+        function DictVis.is_traversable(d::$(esc(t)))
+            return true
+        end
+    end
+
+    return code
+end
 
 #####################################################
 # Traverse & operate on the leaves of the tree via DFS

@@ -10,4 +10,3 @@ function downsample(x::AbstractArray, shrinkage::Number)
     return shrunk 
 end
 
-
