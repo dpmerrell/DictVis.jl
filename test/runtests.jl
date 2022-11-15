@@ -10,11 +10,13 @@ function basic_tests()
             )
     html_path = "basic_tests.html"
 
-    @testset "Dictionary tests" begin
+    @testset "Basic tests" begin
 
+        # Just test that they run to completion
         p = generate_plot(d)
-        generate_html(d, html_path) 
+        @test true
 
+        generate_html(d, html_path) 
         @test true
     end 
     

@@ -1,5 +1,4 @@
 
-
 # Default trace generation for vectors and matrices
 # of real numbers.
 #
@@ -9,13 +8,22 @@
 
 @plottable AbstractVector{<:Real}
 function leaf_trace(leaf::AbstractVector{<:Real})
-
     trace = scatter(y=leaf[:])
     return trace
 end
 
+MAX_HEATMAP_SIZE = 10000
+
 @plottable AbstractMatrix{<:Real}
 function leaf_trace(leaf::AbstractMatrix{<:Real})
+
+    M, N = size(leaf)
+    total_size = M*N
+
+    if total_size > MAX_HEATMAP_SIZE
+        shrinkage = ceil(sqrt(total_size/MAX_HEATMAP_SIZE))
+        leaf = downsample(leaf, shrinkage)
+    end
 
     trace = heatmap(z=leaf[:,:], type="heatmap", colorscale="Greys", reversescale=true)
     return trace

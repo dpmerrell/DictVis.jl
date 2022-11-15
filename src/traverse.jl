@@ -128,7 +128,7 @@ function generate_plot(d)
     layout = Layout(
                  updatemenus=[
                      attr(
-                         active=0,
+                         active=-1,
                          buttons=buttons
                          )
                              ]
