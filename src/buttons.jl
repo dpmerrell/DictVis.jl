@@ -11,7 +11,7 @@ is_plottable(x) = false
 # Also define a function that generates a Plotly button for that struct. 
 
 macro plottable(t)
-    return :(is_plottable(leaf::$t) = true)
+    return :(is_plottable(leaf::$(esc(t))) = true)
 end
 
 function leaf_button(leaf, leaf_idx, n_leaves, prefix)

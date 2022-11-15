@@ -18,7 +18,7 @@ is_traversable(x) = false
     dictionary-like and may have plottable descendants.
 """
 macro traversable(t)
-    return :(is_traversable(x::$t) = true) 
+    return :(is_traversable(x::$(esc(t))) = true) 
 end
 
 ## Make some important types traversable by default
